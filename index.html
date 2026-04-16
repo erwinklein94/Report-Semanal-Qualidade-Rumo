@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Report Semanal - RUMO</title>
+    <style>
+        :root {
+            --bg-body:#f4f7f6;--bg-login:#04233f;--bg-sidebar:#04233f;--bg-panel:#FFF;--bg-input:#FFF;
+            --text-main:#212121;--text-muted:#666;--text-title:#04233f;--text-proc:#78909C;--accent:#FFD600;
+            --border-color:#E0E0E0;--shadow-light:rgba(0,0,0,0.05);--shadow-strong:rgba(0,0,0,0.3);
+            --watermark-opacity:0.20;--watermark-filter:none;
+            --bg-ok:#E8F5E9;--text-ok:#2E7D32;--border-ok:#C8E6C9;
+            --bg-nc:#ECEFF1;--text-nc:#546E7A;--border-nc:#CFD8DC;
+            --bg-alert:#FFF3E0;--text-alert:#E65100;--border-alert:#FFE0B2;
+            --bg-bad:#FFEBEE;--text-bad:#C62828;--border-bad:#FFCDD2;
+        }
+        body.dark {
+            --bg-body:#121212;--bg-login:#021324;--bg-sidebar:#021324;--bg-panel:#1E1E1E;--bg-input:#2C2C2C;
+            --text-main:#E0E0E0;--text-muted:#bbb;--text-title:#64b5f6;--text-proc:#B0BEC5;
+            --border-color:#424242;--shadow-light:rgba(0,0,0,0.4);--shadow-strong:rgba(0,0,0,0.5);
+            --watermark-opacity:0.05;--watermark-filter:grayscale(100%) invert(1);
+            --bg-nc:#263238;--text-nc:#B0BEC5;--border-nc:#37474F;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+        body{background:var(--bg-body);color:var(--text-main);min-height:100vh;display:flex;transition:.3s;overflow-x:hidden}
+        .escondido{display:none!important}.bold{font-weight:bold}
+        #login-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg-login);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+        .login-card{background:var(--bg-panel);padding:40px;border-radius:15px;width:100%;max-width:400px;text-align:center;box-shadow:0 15px 35px var(--shadow-strong)}
+        .login-logo{width:150px;margin-bottom:15px;filter:brightness(0.2)}
+        body.dark .login-logo{filter:brightness(0.8)}
+        .login-subtitle{font-size:.8rem;color:var(--text-muted);margin:-15px 0 25px;font-weight:600;line-height:1.3}
+        #main-layout{display:none;width:100%;position:relative;z-index:1}
+        #main-layout::before{content:"";position:fixed;top:0;left:0;width:100vw;height:100vh;background:url('https://inevitable-violet-aqhzqzsvkz.edgeone.app/transporte.jpg') center/cover no-repeat;opacity:var(--watermark-opacity);filter:var(--watermark-filter);z-index:-1;pointer-events:none}
+        aside{width:280px;background:var(--bg-sidebar);color:#fff;display:flex;flex-direction:column;padding:20px 0;flex-shrink:0;box-shadow:2px 0 10px rgba(0,0,0,.1);transition:.4s ease}
+        aside.hidden{transform:translateX(-100%);width:0;overflow:hidden;padding:0}
+        .sidebar-logo{display:block;width:140px;margin:0 auto 10px;filter:brightness(0) invert(1)}
+        .sidebar-subtitle{text-align:center;font-size:.75rem;opacity:.9;margin:0 15px 20px;font-weight:500}
+        .menu-header{padding:10px 25px 15px;font-size:1.1rem;font-weight:600;border-bottom:2px solid rgba(255,255,255,.3);margin-bottom:10px}
+        .menu-item{padding:15px 25px;cursor:pointer;transition:.3s;border-left:4px solid transparent;font-size:.95rem;font-weight:500;opacity:.85;display:flex;align-items:center;gap:8px}
+        .menu-item:hover,.menu-item.active{background:rgba(255,255,255,.1);opacity:1}
+        .menu-item.active{border-left-color:var(--accent)}
+        .sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;width:100%}
+        .logout-btn{margin:0 25px 15px;padding:10px 15px;background:rgba(211,47,47,.15);border:1px solid rgba(211,47,47,.3);border-radius:8px;color:#ff8a80;font-weight:600;cursor:pointer;width:calc(100% - 50px);transition:.3s}
+        .logout-btn:hover{background:rgba(211,47,47,.4);color:#fff}
+        .suggest-btn{margin:0 25px 15px;padding:10px 15px;background:rgba(37,211,102,.15);border:1px solid rgba(37,211,102,.4);border-radius:8px;color:#81e8a8;font-weight:600;cursor:pointer;width:calc(100% - 50px);transition:.3s;display:flex;align-items:center;justify-content:center;gap:8px;font-size:.9rem}
+        .suggest-btn:hover{background:rgba(37,211,102,.4);color:#fff}
+        .dark-toggle{margin-bottom:10px;padding:5px;background:transparent;border:none;cursor:pointer;font-size:2.2rem}
+        .dark-toggle .icon-sun{display:none}
+        body.dark .dark-toggle .icon-sun{display:inline;color:var(--accent)}
+        body.dark .dark-toggle .icon-moon{display:none}
+        .sidebar-credit{text-align:center;font-size:.75rem;opacity:.7;margin-bottom:12px}
+        main{flex-grow:1;padding:40px;overflow-y:auto;position:relative;display:flex;flex-direction:column}
+        .content-section{display:block;max-width:1100px;margin:0 auto;flex-grow:1;width:100%}
+        h1{margin-bottom:25px;color:var(--text-title);font-size:1.8rem}
+        .proc-title{color:var(--text-proc);font-weight:400;font-size:.85em}
+        .card{background:var(--bg-panel);border-radius:12px;padding:30px;box-shadow:0 4px 15px var(--shadow-light);position:relative;z-index:1;overflow:hidden;margin-bottom:20px}
+        .card::before{content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:url('https://www.rumolog.com/wp-content/themes/rumo/assets/img/home/logo.svg') center/60% no-repeat;opacity:.03;z-index:-1;pointer-events:none;filter:var(--watermark-filter)}
+        #toggle-sidebar-btn{position:fixed;top:20px;left:20px;z-index:9999;background:var(--bg-login);color:#fff;border:none;width:50px;height:50px;border-radius:50%;font-size:1.6rem;box-shadow:0 4px 12px var(--shadow-strong);display:none;cursor:pointer;align-items:center;justify-content:center;padding:0;line-height:1}
+        .form-group{margin-bottom:15px;width:100%;display:flex;flex-direction:column;gap:8px}
+        .form-group label{font-weight:bold;font-size:.85rem;color:var(--text-muted)}
+        .form-group select,.form-group input,.form-group textarea{width:100%;padding:12px;border:1px solid var(--border-color);border-radius:8px;font-size:1rem;background:var(--bg-input);color:var(--text-main);font-family:inherit}
+        .btn-analisar{width:100%;padding:16px;background:var(--bg-login);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:10px;transition:.2s}
+        .btn-analisar:hover{filter:brightness(1.2)}
+        .error-msg{color:#d32f2f;font-size:.85rem;margin-top:10px;display:none}
+
+```
+    /* SELETORES HORIZONTAIS */
+    .seletores-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:10px}
+    @media(max-width:600px){.seletores-grid{grid-template-columns:1fr}}
+
+    /* CABEÇALHO DO REPORT */
+    .report-header{background:linear-gradient(135deg,var(--bg-login),#0d3a5e);color:#fff;padding:20px 25px;border-radius:12px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;box-shadow:0 4px 15px var(--shadow-light)}
+    body.dark .report-header{background:linear-gradient(135deg,#021324,#0d3a5e)}
+    .report-header h2{font-size:1.3rem;font-weight:600;margin:0}
+    .report-header .badge-semana{background:var(--accent);color:var(--bg-login);padding:6px 14px;border-radius:20px;font-weight:bold;font-size:.9rem}
+
+    /* GRID DE INDICADORES */
+    .indicadores-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:15px;margin-bottom:20px}
+    .indicador-card{background:var(--bg-input);border:1px solid var(--border-color);border-radius:10px;padding:18px;transition:.3s;position:relative;overflow:hidden}
+    .indicador-card:hover{transform:translateY(-3px);box-shadow:0 6px 18px var(--shadow-light)}
+    .indicador-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent)}
+    .indicador-card.nc::before{background:var(--border-nc)}
+    .indicador-label{font-size:.8rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;line-height:1.3}
+    .indicador-valor{font-size:1.6rem;font-weight:bold;color:var(--text-title);line-height:1.2}
+    .indicador-card.nc .indicador-valor{color:var(--text-nc);font-size:1.3rem;font-style:italic}
+    .indicador-sub{font-size:.75rem;color:var(--text-muted);margin-top:4px}
+
+    /* SUBSEÇÕES */
+    .secao-header{background:linear-gradient(135deg,var(--bg-login),var(--text-title));color:#fff;padding:12px 18px;border-radius:8px;margin:25px 0 15px;font-weight:bold;font-size:.95rem;display:flex;align-items:center;gap:10px}
+    body.dark .secao-header{background:linear-gradient(135deg,#021324,#0d3a5e)}
+
+    /* TABELAS POR FORNECEDOR / DETALHE */
+    .tabela-report{width:100%;border-collapse:collapse;margin-top:10px;background:var(--bg-input);border-radius:8px;overflow:hidden}
+    .tabela-report th{background:var(--bg-login);color:#fff;padding:12px;text-align:left;font-size:.85rem;font-weight:600}
+    body.dark .tabela-report th{background:#021324}
+    .tabela-report td{padding:12px;border-bottom:1px solid var(--border-color);font-size:.9rem}
+    .tabela-report tr:last-child td{border-bottom:none}
+    .tabela-report td.nc{color:var(--text-nc);font-style:italic}
+
+    .estado-vazio{text-align:center;padding:60px 20px;color:var(--text-muted)}
+    .estado-vazio-icon{font-size:4rem;margin-bottom:15px;opacity:.5}
+
+    @media(max-width:768px){aside{position:fixed;height:100vh;z-index:1000;left:0;top:0;width:280px}main{padding:80px 20px 20px}h1{font-size:1.4rem}.indicadores-grid{grid-template-columns:1fr 1fr}.indicador-valor{font-size:1.3rem}}
+    @media(max-width:480px){.indicadores-grid{grid-template-columns:1fr}}
+</style>
+```
+
+</head>
+<body>
+    <div id="login-screen">
+        <div class="login-card">
+            <img src="https://www.rumolog.com/wp-content/themes/rumo/assets/img/home/logo.svg" alt="Rumo" class="login-logo">
+            <div class="login-subtitle">Coordenação de Qualidade e Homologação dos Materiais de Via Permanente</div>
+            <p class="bold" style="margin-bottom:20px">Report Semanal</p>
+            <div class="form-group"><input type="password" id="user-password" placeholder="Digite a senha de acesso"></div>
+            <button class="btn-analisar" onclick="validarAcesso()">ENTRAR</button>
+            <p id="error-msg" class="error-msg">Senha incorreta</p>
+        </div>
+    </div>
+
+```
+<div id="main-layout">
+    <aside id="sidebar">
+        <div class="sidebar-top">
+            <img src="https://www.rumolog.com/wp-content/themes/rumo/assets/img/home/logo.svg" alt="Rumo" class="sidebar-logo">
+            <div class="sidebar-subtitle">Coordenação de Qualidade e Homologação dos Materiais de Via Permanente</div>
+            <div class="menu-header">Report Semanal</div>
+            <div class="menu-item active">📊 Report por Semana</div>
+        </div>
+        <div class="sidebar-bottom">
+            <button onclick="document.body.classList.toggle('dark')" class="dark-toggle"><span class="icon-moon">🌙</span><span class="icon-sun">☀️</span></button>
+            <button onclick="sugerirMudanca()" class="suggest-btn">💡 Sugerir Mudança</button>
+            <div class="sidebar-credit">Desenvolvido por Erwin Klein</div>
+            <button onclick="fazerLogout()" class="logout-btn">🚪 Logoff</button>
+        </div>
+    </aside>
+    <main>
+        <button id="toggle-sidebar-btn" onclick="toggleSidebar()">☰</button>
+
+        <section class="content-section">
+            <h1>Report Semanal <span class="proc-title">— Qualidade e Homologação</span></h1>
+
+            <div class="card">
+                <div class="seletores-grid">
+                    <div class="form-group">
+                        <label>📅 Selecione a Semana:</label>
+                        <select id="sel-semana" onchange="renderizarReport()">
+                            <option value="">Selecione...</option>
+                            <option value="5">Semana 5</option>
+                            <option value="6">Semana 6</option>
+                            <option value="7">Semana 7</option>
+                            <option value="8">Semana 8</option>
+                            <option value="9">Semana 9</option>
+                            <option value="10">Semana 10</option>
+                            <option value="11">Semana 11</option>
+                            <option value="12">Semana 12</option>
+                            <option value="13">Semana 13</option>
+                            <option value="14">Semana 14</option>
+                            <option value="15">Semana 15</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>🏗️ Selecione a Área:</label>
+                        <select id="sel-area" onchange="renderizarReport()">
+                            <option value="">Selecione...</option>
+                            <option value="amv">AMV</option>
+                            <option value="brita">Brita / Lastro</option>
+                            <option value="concreto">Dormente de Concreto</option>
+                            <option value="madeira">Dormente de Madeira</option>
+                            <option value="sub">Subcomponentes</option>
+                            <option value="rnc">RNC (Não Conformidades)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="report-container">
+                <div class="card estado-vazio">
+                    <div class="estado-vazio-icon">📋</div>
+                    <h3 style="color:var(--text-title);margin-bottom:8px">Selecione Semana e Área</h3>
+                    <p>Escolha uma semana e uma área nos campos acima para visualizar os indicadores do Report Semanal.</p>
+                </div>
+            </div>
+
+            <div class="aviso-normativo" style="text-align:center;font-size:.8rem;color:var(--text-muted);margin-top:20px;padding:12px;border-radius:8px;background:rgba(0,0,0,.03);">
+                Dados atualizados semanalmente pela Coordenação de Qualidade VP • Rumo Logística
+            </div>
+        </section>
+    </main>
+</div>
+```
+
+<script>
+// === HELPERS ===
+const $=id=>document.getElementById(id);
+function hideEl(id){const e=$(id);if(e)e.classList.add('escondido')}
+function showEl(id,t='block'){const e=$(id);if(e){e.classList.remove('escondido');e.style.display=t}}
+
+// === AUTH & NAV ===
+function validarAcesso(){
+    if($('user-password').value.trim()==='1272'){
+        hideEl('login-screen');showEl('main-layout','flex');
+        if(innerWidth<=768){$('sidebar').classList.add('hidden');showEl('toggle-sidebar-btn','flex')}
+    }else showEl('error-msg')
+}
+function fazerLogout(){
+    if(confirm("Deseja realmente sair e limpar os dados locais?")){
+        localStorage.removeItem('rumoReportDados');location.reload()
+    }
+}
+function sugerirMudanca(){
+    const msg=encodeURIComponent("Olá Erwin, gostaria de sugerir uma mudança / melhoria para o Report Semanal RUMO:\n\n");
+    window.open(`https://wa.me/5541992581521?text=${msg}`,'_blank')
+}
+function toggleSidebar(){$('sidebar').classList.remove('hidden');hideEl('toggle-sidebar-btn')}
+
+// ============================================================
+// === BANCO DE DADOS DO REPORT ================================
+// ============================================================
+// Para preencher um valor real, substitua "N/C" pelo dado.
+// Estrutura: DADOS[area][semana] = { chave: valor, ... }
+// ============================================================
+
+const DADOS = {
+    amv: {
+        // Exemplo de preenchimento futuro:
+        // 5: { pecasInspecionadas: 120, solicitacaoAjustes: 3, reprovadas: 1, aderencia: "98%", ... }
+    },
+    brita: {},
+    concreto: {},
+    madeira: {},
+    sub: {},
+    rnc: {}
+};
+
+// ============================================================
+// === DEFINIÇÃO DOS INDICADORES POR ÁREA ======================
+// ============================================================
+
+const ESTRUTURA = {
+    amv: {
+        nome: "AMV",
+        icone: "⚙️",
+        secoes: [
+            {
+                titulo: "📊 Indicadores Gerais",
+                tipo: "cards",
+                itens: [
+                    { chave: "pecasInspecionadas", label: "Peças Inspecionadas" },
+                    { chave: "solicitacaoAjustes", label: "Solicitação de Ajustes" },
+                    { chave: "reprovadas", label: "Reprovadas" },
+                    { chave: "aderenciaInspecao", label: "Aderência de Inspeção" }
+                ]
+            },
+            {
+                titulo: "🏭 Por Fornecedor",
+                tipo: "cards",
+                itens: [
+                    { chave: "pecasInspecionadasFornecedor", label: "Peças Inspecionadas por Fornecedor" },
+                    { chave: "solicitacaoAjustesFornecedor", label: "Solicitação de Ajustes por Fornecedor" }
+                ]
+            },
+            {
+                titulo: "📦 Disponibilidade",
+                tipo: "cards",
+                itens: [
+                    { chave: "pecasDisponiveis", label: "Peças Disponíveis para Inspeção" },
+                    { chave: "pecasIndisponiveis", label: "Peças Indisponíveis para Inspeção" }
+                ]
+            },
+            {
+                titulo: "📈 Evolução Temporal",
+                tipo: "cards",
+                itens: [
+                    { chave: "pecasInspecionadasMes", label: "Peças Inspecionadas por Mês" },
+                    { chave: "pecasInspecionadasSemana", label: "Peças Inspecionadas por Semana" }
+                ]
+            }
+        ]
+    },
+    brita: {
+        nome: "Brita / Lastro",
+        icone: "🪨",
+        secoes: [
+            {
+                titulo: "📊 Indicadores Gerais",
+                tipo: "cards",
+                itens: [
+                    { chave: "ensaiosRealizados", label: "Ensaios Realizados" },
+                    { chave: "ensaiosAprovados", label: "Ensaios Aprovados" },
+                    { chave: "ensaiosReprovados", label: "Ensaios Reprovados" },
+                    { chave: "percentualAprovados", label: "% de Ensaios Aprovados" },
+                    { chave: "mediaEnsaiosMensais", label: "Média de Ensaios Mensais" }
+                ]
+            },
+            {
+                titulo: "🔬 Por Tipo de Ensaio",
+                tipo: "cards",
+                itens: [
+                    { chave: "ensaiosGranulometria", label: "Ensaios de Granulometria" },
+                    { chave: "ensaiosForma", label: "Ensaios de Forma dos Fragmentos" },
+                    { chave: "quantidadeAprovados", label: "Quantidade de Ensaios Aprovados" }
+                ]
+            },
+            {
+                titulo: "⛏️ Por Pedreira",
+                tipo: "cards",
+                itens: [
+                    { chave: "ensaiosPorPedreira", label: "Ensaios por Pedreira" }
+                ]
+            },
+            {
+                titulo: "📈 Evolução e Metas",
+                tipo: "cards",
+                itens: [
+                    { chave: "taxaAprovacaoSemana", label: "Taxa de Aprovação por Semana" },
+                    { chave: "taxaAprovacaoMes", label: "Taxa de Aprovação por Mês" },
+                    { chave: "evolucaoAprovacaoSemanal", label: "Evolução de Aprovação — Semanal" },
+                    { chave: "evolucaoAprovacaoMetaMensal", label: "Evolução de Aprovação X Meta — Mensal" }
+                ]
+            }
+        ]
+    },
+    concreto: {
+        nome: "Dormente de Concreto",
+        icone: "🧱",
+        secoes: [
+            {
+                titulo: "📊 Produção Geral",
+                tipo: "cards",
+                itens: [
+                    { chave: "totalFabricado", label: "Total Fabricado" },
+                    { chave: "aprovados", label: "Aprovados" },
+                    { chave: "reprovados", label: "Reprovados" },
+                    { chave: "percentualAprovacao", label: "% de Aprovação" },
+                    { chave: "percentualReprovacao", label: "% de Reprovação" },
+                    { chave: "ensaiosRealizados", label: "Ensaios Realizados" }
+                ]
+            },
+            {
+                titulo: "📈 Aprovação Temporal",
+                tipo: "cards",
+                itens: [
+                    { chave: "aprovacaoMensal", label: "% de Aprovação Mensal" },
+                    { chave: "aprovacaoSemanal", label: "% de Aprovação Semanal" },
+                    { chave: "producaoSemana", label: "Produção por Semana" },
+                    { chave: "producaoMes", label: "Produção por Mês" }
+                ]
+            },
+            {
+                titulo: "🔍 Detalhado de Reprovas",
+                tipo: "cards",
+                itens: [
+                    { chave: "repTrincas", label: "Trincas" },
+                    { chave: "repVazios", label: "Vazios" },
+                    { chave: "repOmbreiras", label: "Ombreiras" },
+                    { chave: "repQuebras", label: "Quebras" },
+                    { chave: "repUSP", label: "USP" },
+                    { chave: "repFalhaOperacional", label: "Falha Operacional" },
+                    { chave: "repOutros", label: "Outros" }
+                ]
+            },
+            {
+                titulo: "🏭 Por Fornecedor / Fábrica",
+                tipo: "cards",
+                itens: [
+                    { chave: "cavanFabricados", label: "Cavan — Fabricados na Semana" },
+                    { chave: "cavanRefugados", label: "Cavan — Refugados na Semana" },
+                    { chave: "conpremFabricados", label: "Conprem — Fabricados na Semana" },
+                    { chave: "conpremRefugados", label: "Conprem — Refugados na Semana" }
+                ]
+            },
+            {
+                titulo: "📅 Previsão & Acompanhamento",
+                tipo: "cards",
+                itens: [
+                    { chave: "aSeremFabricados", label: "A Serem Fabricados na Próxima Semana" },
+                    { chave: "taxaReprovaEvolucao", label: "Taxa de Reprova — Evolução Semana a Semana" }
+                ]
+            }
+        ]
+    },
+    madeira: {
+        nome: "Dormente de Madeira",
+        icone: "🪵",
+        secoes: [
+            {
+                titulo: "📊 Indicadores Gerais",
+                tipo: "cards",
+                itens: [
+                    { chave: "inspecionados", label: "Inspecionados" },
+                    { chave: "aprovados", label: "Aprovados" },
+                    { chave: "reprovados", label: "Reprovados" },
+                    { chave: "percentualAprovacao", label: "% de Aprovação" },
+                    { chave: "percentualReprovacao", label: "% de Reprovação" }
+                ]
+            },
+            {
+                titulo: "🏭 Por Fornecedor",
+                tipo: "cards",
+                itens: [
+                    { chave: "pecasInspecionadasFornecedor", label: "Peças Inspecionadas por Fornecedor" },
+                    { chave: "aprovadosFornecedor", label: "Aprovados por Fornecedor" },
+                    { chave: "reclassificadosFornecedor", label: "Reclassificados por Fornecedor" },
+                    { chave: "reprovadosFornecedor", label: "Reprovados por Fornecedor" },
+                    { chave: "taxaAprovacaoFornecedor", label: "Taxa de Aprovação por Fornecedor" }
+                ]
+            },
+            {
+                titulo: "📈 Evolução Temporal",
+                tipo: "cards",
+                itens: [
+                    { chave: "taxaAprovacaoSemana", label: "Taxa de Aprovação por Semana" },
+                    { chave: "taxaAprovacaoMes", label: "Taxa de Aprovação por Mês" }
+                ]
+            }
+        ]
+    },
+    sub: {
+        nome: "Subcomponentes",
+        icone: "🔩",
+        secoes: [
+            {
+                titulo: "📊 Lotes & Peças",
+                tipo: "cards",
+                itens: [
+                    { chave: "lotesInspecionados", label: "Quantidade de Lotes Inspecionados" },
+                    { chave: "lotesReprovados", label: "Quantidade de Lotes Reprovados" },
+                    { chave: "pecasLiberadas", label: "Quantidade de Peças Liberadas" },
+                    { chave: "pecasNaoConformes", label: "Quantidade de Peças Não Conformes" }
+                ]
+            },
+            {
+                titulo: "🏭 Por Fornecedor",
+                tipo: "cards",
+                itens: [
+                    { chave: "amostrasFornecedor", label: "Amostras Inspecionadas por Fornecedor" },
+                    { chave: "pecasInspecionadasFornecedor", label: "Peças Inspecionadas por Fornecedor" },
+                    { chave: "pecasLiberadasFornecedor", label: "Peças Liberadas por Fornecedor" }
+                ]
+            },
+            {
+                titulo: "📦 Por Material e Período",
+                tipo: "cards",
+                itens: [
+                    { chave: "inspecaoMaterial", label: "Inspeção por Material" },
+                    { chave: "inspecoesMes", label: "Inspeções por Mês" }
+                ]
+            }
+        ]
+    },
+    rnc: {
+        nome: "RNC — Não Conformidades",
+        icone: "⚠️",
+        secoes: [
+            {
+                titulo: "📊 Total de Registros",
+                tipo: "cards",
+                itens: [
+                    { chave: "totalRegistros", label: "Total de Registros" },
+                    { chave: "regConcluido", label: "Registros Concluídos" },
+                    { chave: "regAndamento", label: "Registros Em Andamento" },
+                    { chave: "regCancelado", label: "Registros Cancelados" }
+                ]
+            },
+            {
+                titulo: "🗂️ Registros Abertos",
+                tipo: "cards",
+                itens: [
+                    { chave: "abertosArea", label: "Abertos por Área" },
+                    { chave: "abertosMaterial", label: "Abertos por Material" },
+                    { chave: "abertosFornecedor", label: "Abertos por Fornecedor" }
+                ]
+            },
+            {
+                titulo: "📦 Consolidado",
+                tipo: "cards",
+                itens: [
+                    { chave: "totalPorMaterial", label: "Total de Registros por Material" }
+                ]
+            }
+        ]
+    }
+};
+
+// ============================================================
+// === RENDERIZAÇÃO ============================================
+// ============================================================
+
+function renderizarReport() {
+    const semana = $('sel-semana').value;
+    const area = $('sel-area').value;
+    const ct = $('report-container');
+
+    if (!semana || !area) {
+        ct.innerHTML = `
+            <div class="card estado-vazio">
+                <div class="estado-vazio-icon">📋</div>
+                <h3 style="color:var(--text-title);margin-bottom:8px">Selecione Semana e Área</h3>
+                <p>Escolha uma semana e uma área nos campos acima para visualizar os indicadores do Report Semanal.</p>
+            </div>`;
+        return;
+    }
+
+    const est = ESTRUTURA[area];
+    const dadosArea = DADOS[area] || {};
+    const dadosSemana = dadosArea[semana] || {};
+
+    let html = `
+        <div class="report-header">
+            <h2>${est.icone} ${est.nome}</h2>
+            <span class="badge-semana">📅 Semana ${semana}</span>
+        </div>
+        <div class="card">`;
+
+    est.secoes.forEach(sec => {
+        html += `<div class="secao-header">${sec.titulo}</div>`;
+        html += `<div class="indicadores-grid">`;
+        sec.itens.forEach(item => {
+            const v = dadosSemana[item.chave];
+            const temValor = v !== undefined && v !== null && v !== "";
+            const classeCard = temValor ? "" : "nc";
+            const valor = temValor ? v : "N/C";
+            html += `
+                <div class="indicador-card ${classeCard}">
+                    <div class="indicador-label">${item.label}</div>
+                    <div class="indicador-valor">${valor}</div>
+                    ${!temValor ? '<div class="indicador-sub">Dado não coletado</div>' : ''}
+                </div>`;
+        });
+        html += `</div>`;
+    });
+
+    html += `</div>`;
+    ct.innerHTML = html;
+
+    // Salva seleção
+    localStorage.setItem('rumoReportDados', JSON.stringify({semana, area, sessao_ativa: true}));
+}
+
+// === STORAGE ===
+function carregarDadosLocal() {
+    const s = localStorage.getItem('rumoReportDados');
+    if (s) {
+        const d = JSON.parse(s);
+        if (d.semana) $('sel-semana').value = d.semana;
+        if (d.area) $('sel-area').value = d.area;
+        if (d.sessao_ativa) {
+            hideEl('login-screen'); showEl('main-layout', 'flex');
+            if (innerWidth <= 768) { $('sidebar').classList.add('hidden'); showEl('toggle-sidebar-btn', 'flex') }
+        }
+        if (d.semana && d.area) renderizarReport();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => { carregarDadosLocal(); });
+</script>
+
+</body>
+</html>
