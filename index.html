@@ -190,7 +190,6 @@
         </section>
     </main>
 </div>
-```
 
 <script>
 // === HELPERS ===
@@ -219,20 +218,109 @@ function toggleSidebar(){$('sidebar').classList.remove('hidden');hideEl('toggle-
 // ============================================================
 // === BANCO DE DADOS DO REPORT ================================
 // ============================================================
-// Para preencher um valor real, substitua "N/C" pelo dado.
-// Estrutura: DADOS[area][semana] = { chave: valor, ... }
+// Semana 5 — Janeiro/2026 (01/01/2026 a 30/01/2026)
 // ============================================================
 
 const DADOS = {
     amv: {
-        // Exemplo de preenchimento futuro:
-        // 5: { pecasInspecionadas: 120, solicitacaoAjustes: 3, reprovadas: 1, aderencia: "98%", ... }
+        5: {
+            pecasInspecionadas: 259,
+            solicitacaoAjustes: 8,
+            reprovadas: 0,
+            aderenciaInspecao: "99%",
+            pecasInspecionadasFornecedor: "BR Parts: 247 | Ibrafer: 12",
+            solicitacaoAjustesFornecedor: "Ibrafer: 5 | BR Parts: 3",
+            pecasDisponiveis: "BR Parts: 247 | Ibrafer: 12",
+            pecasIndisponiveis: 0,
+            pecasInspecionadasMes: 259,
+            pecasInspecionadasSemana: 259
+        }
     },
-    brita: {},
-    concreto: {},
-    madeira: {},
-    sub: {},
-    rnc: {}
+    brita: {
+        5: {
+            ensaiosRealizados: 60,
+            ensaiosAprovados: 56,
+            ensaiosReprovados: 4,
+            percentualAprovados: "93%",
+            mediaEnsaiosMensais: 60,
+            ensaiosGranulometria: "45 (44 aprov / 1 reprov)",
+            ensaiosForma: "15 (12 aprov / 3 reprov)",
+            quantidadeAprovados: 56,
+            ensaiosPorPedreira: "Basalto: 16 | Embu S.A.: 12 (4 reprov) | Min. Noroeste Paulista: 12 | Autem Mineração: 8 | Petra: 4 | Quimassa: 4",
+            taxaAprovacaoSemana: "93% (-6% vs S4)",
+            taxaAprovacaoMes: "93,33% (Jan/2026)",
+            evolucaoAprovacaoSemanal: "S2: 83% | S3: 86% | S4: 99% | S5: 93%",
+            evolucaoAprovacaoMetaMensal: "Jan/26: 92% | Meta: 90% | Jan/25: 27% (+65%)"
+        }
+    },
+    concreto: {
+        5: {
+            totalFabricado: "5.104 (Cavan: 4.225 | Conprem: 879)",
+            aprovados: "5.099",
+            reprovados: "5 (Cavan: 3 | Conprem: 2)",
+            percentualAprovacao: "99,9%",
+            percentualReprovacao: "0,1%",
+            ensaiosRealizados: "Cavan: 2 | Conprem: 0",
+            aprovacaoMensal: "99,8% (Jan/2026)",
+            aprovacaoSemanal: "99,9% (+0,1% vs S4)",
+            producaoSemana: "Cavan: 4.225 | Conprem: 879",
+            producaoMes: "Jan/26: 99,80% | Jan/25: 99,80%",
+            repTrincas: "Cavan: 0 | Conprem: 1",
+            repVazios: "Cavan: 0 | Conprem: 0",
+            repOmbreiras: "Cavan: 0 | Conprem: 1",
+            repQuebras: "Cavan: 1 | Conprem: 0",
+            repUSP: "Cavan: 0 | Conprem: 0",
+            repFalhaOperacional: "Cavan: 2 | Conprem: 0",
+            repOutros: "Cavan: 0 | Conprem: 0",
+            cavanFabricados: "4.225",
+            cavanRefugados: "3",
+            conpremFabricados: "879",
+            conpremRefugados: "2",
+            aSeremFabricados: "Cavan: 4.200 | Conprem: 0",
+            taxaReprovaEvolucao: "Cavan: S2=0,46% | S3=0,12% | S4=0,17% | S5=0,05% || Conprem: S2=1,61% | S3=0,32% | S4=0,60% | S5=0,23% (Limite: 0,50%)"
+        }
+    },
+    madeira: {
+        5: {
+            inspecionados: 1988,
+            aprovados: 1698,
+            reprovados: 290,
+            percentualAprovacao: "87%",
+            percentualReprovacao: "13%",
+            pecasInspecionadasFornecedor: "Pandolfi: 980 | Larssen: 672 | Ricken: 336",
+            aprovadosFornecedor: "Pandolfi: 814 | Larssen: 563 | Ricken: 321",
+            reclassificadosFornecedor: "Pandolfi: 0 | Larssen: 0 | Ricken: 0",
+            reprovadosFornecedor: "Pandolfi: 166 | Larssen: 109 | Ricken: 15",
+            taxaAprovacaoFornecedor: "Ricken: 95,66% | Larssen: 83,78% | Pandolfi: 83,13%",
+            taxaAprovacaoSemana: "87% (-7% vs S4) | Geral semanal: 86,89%",
+            taxaAprovacaoMes: "Jan/26: 88,29% | Meta: 80% | Jan/25: 73% (+14%)"
+        }
+    },
+    sub: {
+        5: {
+            lotesInspecionados: 22,
+            lotesReprovados: 0,
+            pecasLiberadas: 198968,
+            pecasNaoConformes: 1,
+            amostrasFornecedor: "Fornecedor A: 160 | Fornecedor B: 128 | Fornecedor C: 455",
+            pecasInspecionadasFornecedor: "160 | 128 | 455 (rótulos não legíveis no painel)",
+            pecasLiberadasFornecedor: "Verificar painel — rótulos não legíveis",
+            inspecaoMaterial: "4 categorias de material (rótulos não legíveis)",
+            inspecoesMes: "Janeiro/2026"
+        }
+    },
+    rnc: {
+        5: {
+            totalRegistros: 73,
+            regConcluido: "66%",
+            regAndamento: "Manutenção: 11",
+            regCancelado: "Manutenção: 4 | Modernização: 1",
+            abertosArea: "Manutenção: 51 (27 concl. | 11 andam. | 4 canc. | 3 reprov. | 6 aprov.) | Modernização: 22 (21 concl. | 1 canc.)",
+            abertosMaterial: "Dormente madeira: 66 (42 concl. | 11 andam. | 4 canc. | 3 reprov. | 6 aprov.) | Lastro: 7 (6 concl. | 1 canc.)",
+            abertosFornecedor: "Larssen: 15 | Ricken: 11 | Pandolfi: 19 | F. García: 13 | Tratamorte: 6 | Autem: 3 | Petra: 1 | Quimassa: 1 | Minermix: 2 | Granoski: 2",
+            totalPorMaterial: "Lastro: 7 (86% concl.) | Dormente madeira: 66 (64% concl.)"
+        }
+    }
 };
 
 // ============================================================
@@ -557,6 +645,7 @@ function carregarDadosLocal() {
 
 document.addEventListener('DOMContentLoaded', () => { carregarDadosLocal(); });
 </script>
+```
 
 </body>
 </html>
